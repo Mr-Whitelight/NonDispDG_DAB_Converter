@@ -8,7 +8,7 @@ Lgrid = Xgrid/w0; % H
 Rgrid = 0.7;    % ohm 
 
 % Statcom Transformer DYg
-Stran    = 600;  % Rated Power
+Stran    = 1000;  % Rated Power
 Vmv      = 380;  % Rated Voltage (MV side)
 Vlv      = 191;     % Rated Voltage (LV side)
 Rtran_pu = 0.003;   % Total winding resistance
@@ -24,7 +24,7 @@ Rgrid_lv = Rgrid * (1/Ntran) * (1/Ntran);  % ohm referred to LV
 
 
 % Converer parameters
-Pinv = Stran;             % Inverter power : 600 W 
+Pinv = Stran;             % Inverter power : 1000 W 
 Einv_ltl = Vlv;           % Grid line voltage
 Vdc = 400;               %DC link voltage : 400V
 fsw = 10000;              %Switching frequency : 10 kHz
@@ -114,7 +114,7 @@ Ir_limit   = 1;
 Qinit      = 0;
 Ir_init    = Qinit;
 
-% AC Voltage Control
+% % AC Voltage Control
 Trise_V  = 0.15;                                  % Reactive power control rise time, 150 ms
 BW_V     = log(9)/Trise_V;                        % Bandwith - Trise relation of first-order system, 
 Kpv      = (BW_V * Tconv)/(Ltran/Lb + Lgrid_pu);  % dV = (Lg_pu + Lgrid_pu)*dI
@@ -122,11 +122,22 @@ Kiv      = BW_V/(Ltran/Lb + Lgrid_pu);
 Vinit = 1;
 tVinit = 1;
 
-% DC Voltage control
+
+% Active Power Control
+Trise_P  = 0.15;                % Active power control rise time, 200 ms
+BW_P     = log(9)/Trise_P;      % Bandwith - Trise relation of first-order system 
+Kpp      = BW_P * Tconv;
+Kip      = BW_P;                
+Ia_limit = 1;
+Pinit    = 0.85*Pinv/Sb;
+Ia_init  = Pinit;
+
+% 
+% % DC Voltage control
 H_Cdc = 0.1;                          % in J/VA
 E_Cdc = H_Cdc * Sb;                   % Energy stored in the DC capacitor (Joule)
 Cdc   = 2 * E_Cdc / Vdc / Vdc;        % DC capacitor (F)
-
+% 
 Trise_vdc = 0.1;                      % Vdc control rise time, 100 ms
 tau_vdc  = Trise_vdc*1.8;             % response time of the second order system
 zeta_vdc = 1/sqrt(2);                 % damping ratio (0.5 - 1)
@@ -145,7 +156,7 @@ ChopperOFF = 1;
 
 E_ltl = Einv_ltl;
 ma = E_ltl*sqrt(2)/Vdc;
-phia = 0 %asin((Pinit*Sb)*(Li+Lg+Lgrid)*w0/E_ltl/Einv_ltl);
+phia = 0; %asin((Pinit*Sb)*(Li+Lg+Lgrid)*w0/E_ltl/Einv_ltl);
 tinit = 0.25;
 dtsim = 5.0e-6;
 
@@ -168,54 +179,43 @@ dQ3 = 0;
 tQ3 = 5;
 dQ4 = 0;
 tQ4 = 6;
-% 
-% % Voltage reference changes
-% dV1 = 0.005;
-% tV1 = 2;
-% dV2 = -0.01;
-% tV2 = 3;
-% dV3 = +0.005;
-% tV3 = 4;
-% dV4 = 0.01;
-% tV4 = 7;
-
 
 FRT_ON = 0.1;
 FRT_OFF = 0.075;
 FRT_Time = 0.2;
 
 
-%% Parameters for Dual Active Bridge Converter
+%% Parameters file for power_converters_DAB_1ph.slx
 %
-Fsw= 5e3;         % PWM switching frequency (Hz)
+Fsw= 10e3;         % PWM switching frequency (Hz)
 DT= 150e-9;         % Dead time (s)
 Scope_Decimation=1; % Scope Decimation
 Ts=1e-7;            % Control system sample time (s)
 %
-Pnom= 10e3;          % Nominal power (W)
+Pnom= 1000;          % Nominal power (W)
 Vbat= 24;        % DC source 1 nominal voltage (V)
 
 R_DCsrc1=1e-7;      % DC source 1 internal resistance (Ohm)
 %
 % Switches
-Ron_FET= 16e-3;     % FET on-state resistance (Ohm)
+Ron_FET= 20e-3;     % FET on-state resistance (Ohm)
 Rs_FET= 1e6;        % Snubber resistance Rs (Ohm) : 
 Cs_FET= inf;        % Snubber capacitance Cs (F) : 
 Ron_Diode= 10e-3;   % Body diode resistance (Ohm) 
 Vf_Diode= 4.2;      % Body diode forward voltage drop (V)
 %
 % Coupling inductor
-L_Inductor= 8e-6;  % Inductance (H)
+L_Inductor= 1000e-6;  % Inductance (H)
 R_Inductor= 16e-3;  % Resistance (Ohm)
 %
 % Transformer:
-Turn_ratio=15;    % DC Bus nominal voltage is 400V;       
-Rprim_Tr=1e-6;    % Primary resistance (Ohm)
-Lprim_Tr= 0;   % Primary leakage inductance (H)
-Rsec_Tr= 43e-3;     % Secondary resistance (Ohm
-Lsec_Tr= 17e-6;        % Secondary leakage inductance (H)
-Rm_Tr= 10e3;       % Magnetization resistance (Ohm)
-Lm_Tr= 720e-6;     % Magnetization inductance (H)
+Turn_ratio=15;    % DC Bus nominal voltage is 120V;       
+Rprim_Tr=10e-3;    % Primary resistance (Ohm)
+Lprim_Tr= 1e-7;   % Primary leakage inductance (H)
+Rsec_Tr= 10e-3;     % Secondary resistance (Ohm
+Lsec_Tr= 1e-7;     % Secondary leakage inductance (H)
+Rm_Tr= 1e6;       % Magnetization resistance (Ohm)
+Lm_Tr= 100e-3;     % Magnetization inductance (H)
 %
 % Filters
 % High Voltage Capacitor:
@@ -224,5 +224,3 @@ RC_HV= 1e-3;       % Capacitor ESR (Ohm)
 % Low Voltage Capacitor:
 C_LV= 2000e-6;     % Capacitance (F)
 RC_LV= 1e-3;       % Capacitor ESR (Ohm)
-
-
